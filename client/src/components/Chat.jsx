@@ -1,20 +1,19 @@
 import {
   Box,
-  Button,
   Fab,
   Grid,
   List,
   ListItem,
-  ListItemText,
   TextField,
   Typography,
 } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { makeStyles } from "@mui/styles";
 import axios from "axios";
 import Loader from "./Loader";
 import HelpIcon from "@mui/icons-material/Help";
+import { UserDetailsContext } from "../context/UserDetails";
 
 const useStyles = makeStyles({
   table: {
@@ -36,35 +35,67 @@ const useStyles = makeStyles({
     flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
-    height: "70vh",
+    height: "100%",
     width: "90vw",
   },
 });
 
 const Chat = () => {
+  const DB_URL = `https://workout-cf192-default-rtdb.asia-southeast1.firebasedatabase.app/userData.json`;
+
   const classes = useStyles();
+  const { userDetails, setUserDetails } = useContext(UserDetailsContext);
+  console.log("user ==>", userDetails);
+  const {
+    weight,
+    height,
+    leanMuscleMass,
+    fatPercent,
+    age,
+    sex,
+    muscleFibreType,
+    trainingIntensity,
+    trainingStatus,
+    muscleRecovery,
+    displayName,
+  } = userDetails;
+
+  const [userDetailDefaultText, setUserDetailDefaultText] = useState(
+    `my height is${height} cm, wight is ${weight} kgs , lean muscle mass is ${leanMuscleMass} kgs, fat percentage is ${fatPercent}% , age is ${age} years, i am ${sex} , i have ${muscleFibreType} muscle fibre type, on a scale of 1 to 10 my training intensity is ${trainingIntensity}, my training status is ${trainingStatus}, my muscle recovery is around ${muscleRecovery} hrs`
+  );
+  const [usersData, setUsersData] = useState([]);
   const [prompt, setPrompt] = useState("");
   const [response, setResponse] = useState("");
   const [loading, setLoading] = useState(false);
-  const HTTP = "http://localhost:5000/chat/completions";
+  const [finalPrompt, setFinalPrompt] = useState(userDetailDefaultText);
+
+  useEffect(() => {
+    setUserDetailDefaultText(
+      `my height is${height} cm, wight is ${weight} kgs, lean muscle mass is ${leanMuscleMass} kgs, fat percentage is ${fatPercent}%, age is ${age} years, i am ${sex}, i have ${muscleFibreType} muscle fibre type, on a scale of 1 to 10 my training intensity is ${trainingIntensity}, my training status is ${trainingStatus}, my muscle recovery is around ${muscleRecovery} hrs`
+    );
+    console.log("user details ==>", userDetails);
+  }, [userDetails]);
 
   const handleSubmit = (e) => {
     setLoading(true);
     e.preventDefault();
     validatePrompt();
+    setPrompt(userDetailDefaultText);
+    setFinalPrompt((prev) => prev + prompt);
+    console.log("final prompt ==>", finalPrompt);
     setPrompt("");
   };
 
   const validatePrompt = () => {
-    // setLoading(false);
+    // setLoading(true);
     prompt === ""
       ? setResponse("Please enter a question")
       : axios
-          .post(`${HTTP}`, { prompt })
+          .post("http://localhost:5000/chat", { prompt })
           .then((res) => {
             setLoading(false);
             setResponse(res.data.bot);
-            console.log("response==>", res);
+            console.log("response==>", response);
           })
           .catch((error) => {
             console.log(error);
@@ -74,25 +105,80 @@ const Chat = () => {
   const handlePrompt = (e) => {
     setPrompt(e.target.value);
   };
+  const fetchDataHandler = async () => {
+    try {
+      const response = await fetch(DB_URL);
+      if (!response.ok) throw new Error("Something went wrong!");
+      const result = await response.json();
+      console.log(result);
+      const tempData = [];
+      for (const key in result) {
+        tempData.push({
+          id: key,
+          weight: result[key].weight,
+          height: result[key].height,
+          leanMuscleMass: result[key].leanMuscleMass,
+          fatPercent: result[key].fatPercent,
+          age: result[key].age,
+          sex: result[key].sex,
+          muscleFibreType: result[key].muscleFibreType,
+          trainingIntensity: result[key].trainingIntensity,
+          trainingStatus: result[key].trainingStatus,
+          muscleRecovery: result[key].muscleRecovery,
+          displayName: result[key].displayName,
+        });
+      }
+
+      setUsersData(tempData);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      // setIsLoading(false);
+      console.log("users data ==>", usersData);
+    }
+  };
+  useEffect(() => {
+    fetchDataHandler().then((e) => e);
+  }, []);
 
   return (
-    <Grid container component={Box} className={classes.chatSection}>
+    <Grid
+      sx={{ overflowY: `${loading ? "hidden" : "auto"}` }}
+      container
+      component={Box}
+      className={classes.chatSection}
+    >
       <HelpIcon
         sx={{
           width: "100%",
-          height: "30%",
+          height: "20%",
           position: "relative",
-          right: "10%",
-          top: "50px",
+          right: `${loading ? "10%" : "8.5%"}`,
+          top: `${response.includes("\n") ? "-0.5%" : "5%"}`,
         }}
       />
+      {!response.includes("\n") && (
+        <Typography
+          sx={{ ml: "28%", mt: loading ? "1%" : "0" }}
+          variant="h3"
+          color="initial"
+        >
+          AI Personal Trainer
+        </Typography>
+      )}
       <Grid item xs={9}>
         <List className={classes.messageArea}>
-          <ListItem sx={{ bottom: "115px" }} key="1">
+          <ListItem
+            sx={{
+              bottom: `${loading ? "40%" : "118px"}`,
+              right: `${loading ? "4.8%" : "0%"}`,
+            }}
+            key="1"
+          >
             {loading ? (
               <Loader />
             ) : (
-              <Grid container>
+              <Grid sx={{ overflowY: "auto" }} container>
                 <Grid item xs={12}>
                   <Typography
                     sx={{
@@ -101,17 +187,19 @@ const Chat = () => {
                       backgroundColor: "#191f2a",
                       color: "#fff",
                       padding: `1rem 2rem 0.5rem 2rem`,
-                      fontSize: "30px",
+                      fontSize: "20px",
                       display: "flex",
                       alignItems: "center",
-                      width: "58%",
-                      height: "100%",
+                      width: "89%",
+                      height: `${response.includes("\n") ? "100%" : "50%"}`,
                       borderRadius: "20px",
                       ":hover": {
                         cursor: "pointer",
                       },
                       ml: "40px",
-                      mt: "20px",
+                      mt: `${response.includes("\n") ? "7%" : "5%"}`,
+
+                      whiteSpace: "pre-wrap",
                     }}
                     color="black"
                   >
@@ -128,7 +216,7 @@ const Chat = () => {
                     flexDirection: "row",
                     width: "100%",
                     height: "100%",
-
+                    mt: `${response.includes("\n") ? "7%" : "0%"}`,
                     p: "40px",
                   }}
                 >

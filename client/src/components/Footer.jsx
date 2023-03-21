@@ -1,17 +1,24 @@
 import React from "react";
 import styled from "styled-components";
 import logo from "../assets/icons/logo.png";
+import logoText from "../assets/icons/logo_text.png";
 const Footer = () => {
+  const isInfoPage = window.location.href.includes("/tell-us");
   return (
-    <Div>
+    <Div
+      style={{
+        position: isInfoPage ? "absolute" : "sticky",
+        bottom: 0,
+        width: isInfoPage ? "100vw" : "inherit",
+      }}
+    >
       <div className="footer">
         <img src={logo} alt="logo" />
-        <h2>Fit High</h2>
+        <img src={logoText} style={{ width: "100px" }} alt="logo_text" />
       </div>
       <div className="creator">
         {" "}
-        Created by{" "}
-        <a href="https://github.com/Robin-Anmol">Team Ilakatha Mafliya</a>
+        Created by <a href="https://github.com/depada">Team Stack Overflow</a>
       </div>
     </Div>
   );
@@ -22,15 +29,15 @@ const Div = styled.div`
   background: #191f2a;
   display: flex;
   padding: 1.5rem;
-
   gap: 1rem;
   justify-content: space-around;
   align-items: center;
   .footer {
     display: flex;
     justify-content: center;
+    flex-direction: row-reverse;
     align-items: center;
-    gap: 1rem;
+    gap: 0.5rem;
     img {
       width: 40px;
       height: 40px;

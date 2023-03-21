@@ -8,6 +8,10 @@ import Home from "./pages/Home";
 import ExerciseDetail from "./pages/ExerciseDetail";
 import Loader from "../src/components/Loader";
 import Chat from "./components/Chat";
+import KnowYourself from "./components/KnowYourself";
+
+import { UserDetailsProvider } from "./context/UserDetails";
+
 const App = () => {
   const [loaded, setLoaded] = useState(true);
 
@@ -24,11 +28,17 @@ const App = () => {
       ) : (
         <Section>
           <Navbar />
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path={`/exercise/:id`} element={<ExerciseDetail />} />
-            <Route path={`/chat`} element={<Chat />} />
-          </Routes>
+          <UserDetailsProvider>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path={`/exercise/:id`} element={<ExerciseDetail />} />
+              <Route path={`/chat`} element={<Chat />} />
+              <Route
+                path={`/tell-us-about-yourself`}
+                element={<KnowYourself />}
+              />
+            </Routes>
+          </UserDetailsProvider>
           <Footer />
         </Section>
       )}

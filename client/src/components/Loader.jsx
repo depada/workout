@@ -1,5 +1,6 @@
 import React from "react";
 import { GooeyCircleLoader } from "react-loaders-kit";
+import logoTextInverted from "../assets/icons/logoTextInverted.png";
 import styled from "styled-components";
 
 function Loader() {
@@ -13,7 +14,7 @@ function Loader() {
   return (
     <LoaderDiv className="loader">
       <GooeyCircleLoader {...loaderProps} />
-      <h2>Fit High</h2>
+      <img src={logoTextInverted} style={{ width: "100px" }} alt="logo_text" />
     </LoaderDiv>
   );
 }

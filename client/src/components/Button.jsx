@@ -9,7 +9,7 @@ const Button = ({ text, target, className }) => {
 };
 
 const Btn = styled.a`
-  padding: 0.5rem 1.2rem;
+  padding: 0.5rem 0.2rem;
   background-color: #1460e5;
   border-radius: 7px;
   color: #fff;
@@ -17,7 +17,7 @@ const Btn = styled.a`
   width: max-content;
   cursor: pointer;
   font-weight: 500;
-  font-size: 1.3rem;
+  font-size: 1rem;
 
   transition: all 0.2s ease-in-out;
   &:hover {

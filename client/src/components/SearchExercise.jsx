@@ -57,6 +57,14 @@ const SearchExercise = ({
       });
     }
   };
+
+  const handleOnEnter = (e) => {
+    const { keyCode } = e;
+    if (keyCode === 13) {
+      submitHandler();
+    }
+  };
+
   return (
     <Section id="search">
       <div className="container">
@@ -72,6 +80,7 @@ const SearchExercise = ({
             className="inputField"
             placeholder="Search Exercise..."
             value={search}
+            onKeyDown={handleOnEnter}
             onChange={searchHandler}
           />
           <Button onClick={submitHandler}>Search</Button>
@@ -122,7 +131,7 @@ const Section = styled.section`
         color: #fff;
         font-size: 1.7rem;
         padding: 0.5rem 7rem 0.5rem 1rem;
-        border-radius: 7px;
+        border-radius: 14px;
         ::placeholder {
           color: #fff;
           opacity: 0.5;
@@ -209,7 +218,7 @@ const Button = styled.button`
 
   padding: 0.5rem 1.2rem;
   background-color: #1460e5;
-  border-radius: 7px;
+  border-radius: 14px;
   color: #fff;
   text-decoration: none;
   width: max-content;

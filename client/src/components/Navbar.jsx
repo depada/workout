@@ -1,20 +1,31 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import logo from "../assets/icons/logo.png";
+import logoText from "../assets/icons/logo_text.png";
 import { Link } from "react-router-dom";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { MdClose } from "react-icons/md";
 import Button from "./Button";
+import GoogleIcon from "@mui/icons-material/Google";
+import IconButton from "@mui/material/IconButton";
+import { createUserDocFromAuth, signInWithGoogle } from "../utlis/firebase";
+import LogoutIcon from "@mui/icons-material/Logout";
+
 const Navbar = () => {
   const [isNavOpen, setIsNavOpen] = useState(false);
   const html = document.querySelector("html");
   html.addEventListener("click", (e) => setIsNavOpen(false));
+  const logGoogleUserPopUp = async () => {
+    const { user } = await signInWithGoogle();
+    const userDocRef = await createUserDocFromAuth(user);
+    console.log("user doc auth ==>", userDocRef);
+  };
 
   return (
     <Nav>
       <Link to="/" className="logo">
         <img src={logo} alt="logo" />
-        <h2>Fit High</h2>
+        <img src={logoText} style={{ width: "100px" }} alt="logo_text" />
       </Link>
       <div className="toggle">
         {isNavOpen ? (
@@ -39,12 +50,18 @@ const Navbar = () => {
         <a className="tag" href="/chat">
           Chat
         </a>
+        <a className="tag" href="/tell-us-about-yourself">
+          User Details
+        </a>
 
         <Button
           className={` ${isNavOpen ? "tag" : ""}`}
           text={`Search Exercise`}
           target="search"
         />
+        <IconButton onClick={logGoogleUserPopUp}>
+          <GoogleIcon sx={{ fontSize: "50px", color: "white" }} />
+        </IconButton>
       </div>
     </Nav>
   );
@@ -60,12 +77,13 @@ const Nav = styled.nav`
     rgba(60, 64, 67, 1) 0px 1px 3px 1px;
   .logo {
     display: flex;
+    justify-content: center;
+    flex-direction: row-reverse;
     align-items: center;
-    text-decoration: none;
+    gap: 0.5rem;
     img {
       width: 40px;
       height: 40px;
-      margin: 0 20px;
     }
     h2 {
       color: #fff;
@@ -83,7 +101,7 @@ const Nav = styled.nav`
       text-decoration: none;
       margin-right: 2rem;
       color: #fff;
-      font-size: 1.2rem;
+      font-size: 1rem;
       transition: all 0.3 ease-in-out;
       cursor: pointer;
       &:hover {
